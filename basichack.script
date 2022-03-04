@@ -2,7 +2,8 @@ var varServer = 'n00dles';
 
 
 while(true) {
-  hack('varServer');
-  weaken('varServer');
-  grow('varServer');
+  hack(varServer);
+  weaken(varServer);
+  grow(varServer);
 }
+
