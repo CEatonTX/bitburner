@@ -13,15 +13,19 @@ var servers1Port = ["neo-net",
                     "max-hardware",
                     "iron-gym"];
 
+var servers2Port = ["silver-helix",
+                    "phantasy",
+                    "omega-net"]
+
 // Copy our scripts onto each server that requires 0 ports
 // to gain root access. Then use nuke() to gain admin access and
 // run the scripts.
 for (var i = 0; i < servers0Port.length; ++i) {
     var serv = servers0Port[i];
 
-    scp("early-hack-template.script", serv);
+    scp("openports.script", serv);
     nuke(serv);
-    exec("early-hack-template.script", serv, 6);
+    exec("hack.script", serv, 6);
 }
 
 // Wait until we acquire the "BruteSSH.exe" program
@@ -35,8 +39,7 @@ while (!fileExists("BruteSSH.exe")) {
 for (var i = 0; i < servers1Port.length; ++i) {
     var serv = servers1Port[i];
 
-    scp("early-hack-template.script", serv);
-    brutessh(serv);
+    scp("openports.script", serv);
     nuke(serv);
-    exec("early-hack-template.script", serv, 12);
+    exec("hack.script", serv, 6);
 }
