@@ -1,0 +1,13 @@
+var varServer = args[0];
+var numArgs = args.length
+
+
+print("Number of Arguments: " + numArgs)
+print("Hacking Server: " + varServer)
+
+while(true) {
+  hack(varServer);
+  weaken(varServer);
+  grow(varServer);
+}
+
