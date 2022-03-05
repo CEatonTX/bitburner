@@ -26,6 +26,8 @@ if (fileExists("FTPCrack.exe", "home")) {
 // Get root access to target server
 nuke(target);
 
+backdoor(target);
+
 // Infinite loop that continously hacks/grows/weakens the target server
 while(true) {
     if (getServerSecurityLevel(target) > securityThresh) {
