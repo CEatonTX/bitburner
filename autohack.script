@@ -2,8 +2,8 @@ var varServer = args[0];
 var numArgs = args.length
 
 
-print("Number of Arguments: " + numArgs)
-print("Hacking Server: " + varServer)
+tprint("Number of Arguments: " + numArgs)
+tprint("Hacking Server: " + varServer)
 
 while(true) {
   hack(varServer);
