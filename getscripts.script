@@ -1,4 +1,5 @@
 // script to download all needed files to hack
+// this does not work. 
 
 var strGitrepo = "https://raw.githubusercontent.com/CEatonTX/bitburner/main/"
 
@@ -11,15 +12,15 @@ var varScript = [
     "hack.script",
     "main.script",
 	"purchase-server-8gb.script",
-	"delete-server-8gb.script"
-	];
+	"delete-server-8gb.script"];
 
 for (var i = 0; i < varScript.length; ++i) {
 
     var varScript = varScript[i];
     var varFullUrl = strGitrepo + varScript;
 	tprint("Getting Script: " + varScript);
-	wget varFullUrl varScript
+	ns.wget("https://raw.githubusercontent.com/CEatonTX/bitburner/main/hack.script hack.script");
+	//wget "varFullUrl"  "varScript";
 
 }
 tprint("End");
