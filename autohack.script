@@ -17,6 +17,12 @@ if (fileExists("BruteSSH.exe", "home")) {
     brutessh(target);
 }
 
+// If we have the FTPCrack.exe program, use it to open the FTP Port
+// on the target server
+if (fileExists("FTPCrack.exe", "home")) {
+    brutessh(target);
+}
+
 // Get root access to target server
 nuke(target);
 
