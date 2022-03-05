@@ -1,0 +1,9 @@
+// Iterator we'll use for our loop
+var i = 0;
+while(i < 26)  {
+        tprint("killall: pserv-" + i)
+        killall("pserv-" + i)
+        tprint("deleteServer: pserv-" + i)
+        deleteServer("pserv-" + i)
+        ++i;
+    }
