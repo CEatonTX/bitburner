@@ -1,45 +1,90 @@
 // Array of all servers that don't need any ports opened
 // to gain root access. These have 16 GB of RAM
-var servers0Port = ["sigma-cosmetics",
-                    "joesguns",
-                    "nectar-net",
-                    "hong-fang-tea",
-                    "harakiri-sushi"];
+var varServers = ["n00dles",
+    "foodnstuff",
+    "sigma-cosmetics",
+    "joesguns",
+    "nectar-net",
+    "hong-fang-tea",
+    "harakiri-sushi",
+    "neo-net",
+    "zer0",
+    "max-hardware",
+    "iron-gym",
+    "silver-helix",
+    "phantasy",
+    "omega-net",
+    "CSEC",
+    "crush-fitness",
+    "avmnite-02h",
+    "pserv-0",
+    "pserv-1",
+    "pserv-2",
+    "pserv-3",
+    "pserv-4",
+    "pserv-5",
+    "pserv-6",
+    "pserv-7",
+    "pserv-8",
+    "pserv-9",
+    "pserv-10",
+    "pserv-11",
+    "pserv-12",
+    "pserv-13",
+    "pserv-14",
+    "pserv-15",
+    "pserv-16",
+    "pserv-17",
+    "pserv-18",
+    "pserv-19",
+    "pserv-20",
+    "pserv-21",
+    "pserv-22",
+    "pserv-23",
+    "pserv-24"];
 
-// Array of all servers that only need 1 port opened
-// to gain root access. These have 32 GB of RAM
-var servers1Port = ["neo-net",
-                    "zer0",
-                    "max-hardware",
-                    "iron-gym"];
+tprint("Scriptram hack.script: " + getScriptRam("hack.script"))
 
-var servers2Port = ["silver-helix",
-                    "phantasy",
-                    "omega-net"]
+for (var i = 0; i < varServers.length; ++i) {
 
-// Copy our scripts onto each server that requires 0 ports
-// to gain root access. Then use nuke() to gain admin access and
-// run the scripts.
-for (var i = 0; i < servers0Port.length; ++i) {
-    var serv = servers0Port[i];
+    var serv = varServers[i];
+    tprint("Checking Server: " + serv);
 
-    scp("openports.script", serv);
+    //tprint("killall(" + serv + ")");
+    //killall(serv);
+    
+    brutessh(serv);
+    ftpcrack(serv);
     nuke(serv);
-    exec("hack.script", serv, 6);
-}
 
-// Wait until we acquire the "BruteSSH.exe" program
-while (!fileExists("BruteSSH.exe")) {
-    sleep(60000);
-}
+    var servMaxRam = getServerMaxRam(serv);
+    var numInstances = servMaxRam / getScriptRam("hack.script");
 
-// Copy our scripts onto each server that requires 1 port
-// to gain root access. Then use brutessh() and nuke()
-// to gain admin access and run the scripts.
-for (var i = 0; i < servers1Port.length; ++i) {
-    var serv = servers1Port[i];
+    if (numInstances > 0) {
+        if (scriptRunning("hack.script", serv), args[0] = "replace") {
+            tprint("hack.script already running on " + serv + " , replacing");
+            tprint("Attempting to kill hack.script " + serv);
+            scriptKill("hack.script", serv);
 
-    scp("openports.script", serv);
-    nuke(serv);
-    exec("hack.script", serv, 6);
+            tprint("transfering hack.script to " + serv);
+            scp("hack.script", serv);
+
+            tprint("Maximum Ram: " + servMaxRam);
+            tprint("Trying to launch: " + numInstances + " instances");
+            exec("hack.script", serv, numInstances);
+
+        }
+        else if (scriptRunning("hack.script", serv)){
+            tprint("hack.script already running on " + serv + " , skipping");
+        }
+        else {
+            tprint("transfering hack.script to " + serv);
+            scp("hack.script", serv);
+            tprint("hack.script not running.");
+            tprint("Maximum Ram: " + servMaxRam);
+            tprint("Trying to launch: " + numInstances + " instances");
+            exec("hack.script", serv, numInstances);
+        }
+    }
 }
+tprint("End");
