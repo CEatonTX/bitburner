@@ -33,7 +33,7 @@ var varServers = ["n00dles",
     "pserv-6", "pserv-7", "pserv-8", "pserv-9", "pserv-10", "pserv-11",
     "pserv-12", "pserv-13", "pserv-14", "pserv-15", "pserv-16", "pserv-17",
     "pserv-18", "pserv-19", "pserv-20", "pserv-21", "pserv-22", "pserv-23", "pserv-24",
-    "the-hub", "johnson-ortho"];
+    "the-hub", "johnson-ortho", "darkweb"];
 
 function runScript(name, server, instances) {
     tprint("Attempting to kill all scripts running on " + server);
@@ -72,13 +72,28 @@ for (var i = 0; i < varServers.length; ++i) {
         else {
             tprint("need root access on " + varServ + "  trying to get it.");
             if (getServerNumPortsRequired(varServ) > 0) {
-                tprint("brutesssh(" + varServ + ")");
-                brutessh(varServ);
+                if (fileExists("BruteSSH.exe")){
+                    tprint("brutesssh(" + varServ + ")");
+                    brutessh(varServ);
+                }
+                else {tprint("BruteSSH.exe does not exist.")}
             }
             if (getServerNumPortsRequired(varServ) > 1) {
                 tprint("ftpcrack(" + varServ + ")");
+                if (fileExists("FTPcrack.exe")){
                 ftpcrack(varServ);
+                }
+                else {tprint("FTPcrack.exe does not exist.")}
             }
+            if (getServerNumPortsRequired(varServ) > 2) {
+                tprint("relaysmtp(" + varServ + ")");
+                if (fileExists("relaysSMTP.exe")){
+                    relaysmtp(varServ);
+                }
+                else {tprint("relaysmtp.exe does not exist.")}
+            }
+
+
             if (hasRootAccess(varServ)) {
                 tprint("Root access exsists. This is unexpected.");
             }
