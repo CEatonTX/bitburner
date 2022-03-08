@@ -1,57 +1,56 @@
-var ram = args[0];
-var i = 0;
-varMaxRam = getPurchasedServerMaxRam();
-varServerLimit = getPurchasedServerLimit();
+var maxRam = getPurchasedServerMaxRam();
+var serverLimit = getPurchasedServerLimit();
+var myMoney = getMyMoney();
 
-function myMoney() {
+function getMyMoney() {
     return getServerMoneyAvailable("home");
 }
 
-varMyMoney = myMoney();
-
-function determineCost() {
-
+function determineCost(maxRam, serverLimit, myMoney) {
     //determine what the upper limit is for server size
 
-    tprint("Maximum Ram allowed: " + varMaxRam);
-    tprint("Server Limit: " + varMaxRam);
-    tprint("My Money: $" + varMyMoney);
+    tprint("Maximum Ram allowed: " + maxRam);
+    tprint("Server Limit: " + maxRam);
+    tprint("My Money: $" + myMoney);
 
-    for (var i = varMaxRam; i > 1; Math.floor(i /= 2)) {
-
-        varCurrentServerCost = getPurchasedServerCost(i);
-        varTotalCost = varServerLimit * varCurrentServerCost;
-        if (varTotalCost < varMyMoney) {
+    for (var i = maxRam; i > 1; Math.floor(i /= 2)) {
+        currentServerCost = getPurchasedServerCost(i);
+        totalCost = serverLimit * currentServerCost;
+        if (totalCost < myMoney) {
             return (i)
         }
-
-
     }
 }
 
-var varServerSizeToBuy = determineCost();
-var varTotalCost = varServerLimit * getPurchasedServerCost(varServerSizeToBuy);
+var serverSizeToBuy = determineCost(maxRam, serverLimit, myMoney);
+var totalCost = serverLimit * getPurchasedServerCost(serverSizeToBuy);
 
-tprint("Maximum size server I can afford is " + varServerSizeToBuy + "GB. Cost is " + varTotalCost);
+tprint("Maximum size server I can afford is " + serverSizeToBuy + "GB. Cost is " + totalCost);
 
-
+var i = 0;
 while (i < getPurchasedServerLimit()) {
-    if (getServerMoneyAvailable("home") > getPurchasedServerCost(varServerSizeToBuy)) {
-        if (serverExists("pserv-" + i)) {
-            if (getServerMaxRam("pserv-" + i) < varServerSizeToBuy) {
-            tprint("Deleting server pserv-" + i);
-            killall("pserv-" + i);
-            sleep(10000);
-            deleteServer("pserv-" + i);
-            }
-            else {
-                tprint("Server pserv-" + i +" is already the right size.");
+    var currentServer = "pserv-" + i;
+    if (getServerMoneyAvailable("home") > getPurchasedServerCost(serverSizeToBuy)) {
+        if (serverExists(currentServer)) {
+            if (getServerMaxRam("pserv-" + i) < serverSizeToBuy) {
+                tprint("Deleting server pserv-" + i);
+                killall(currentServer);
+                sleep(10000);
+                deleteServer("pserv-" + i);
+                tprint("Purchasing server " + currentServer);
+                var hostname = purchaseServer(currentServer, serverSizeToBuy);
+                sleep(3000);
+                run("updateserver.script", 1, currentServer, "keep");
             }
         }
+
         else {
-            tprint("Purchasing server pserv-" + i);
-            var hostname = purchaseServer("pserv-" + i, varServerSizeToBuy);
+            tprint("Server " + currentServer + " is already the right size.");
         }
-        ++i;
     }
+    else {
+        tprint("Purchasing server " + currentServer);
+        var hostname = purchaseServer(currentServer, serverSizeToBuy);
+    }
+    ++i;
 }
