@@ -1,8 +1,0 @@
-var ram = 8;
-var i = 0;
-while (i < getPurchasedServerLimit()) {
-    if (getServerMoneyAvailable("home") > getPurchasedServerCost(ram)) {
-        var hostname = purchaseServer("pserv-" + i, ram);
-        ++i;
-    }
-}
