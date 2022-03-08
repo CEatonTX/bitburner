@@ -1,0 +1,57 @@
+var ram = args[0];
+var i = 0;
+varMaxRam = getPurchasedServerMaxRam();
+varServerLimit = getPurchasedServerLimit();
+
+function myMoney() {
+    return getServerMoneyAvailable("home");
+}
+
+varMyMoney = myMoney();
+
+function determineCost() {
+
+    //determine what the upper limit is for server size
+
+    tprint("Maximum Ram allowed: " + varMaxRam);
+    tprint("Server Limit: " + varMaxRam);
+    tprint("My Money: $" + varMyMoney);
+
+    for (var i = varMaxRam; i > 1; Math.floor(i /= 2)) {
+
+        varCurrentServerCost = getPurchasedServerCost(i);
+        varTotalCost = varServerLimit * varCurrentServerCost;
+        if (varTotalCost < varMyMoney) {
+            return (i)
+        }
+
+
+    }
+}
+
+var varServerSizeToBuy = determineCost();
+var varTotalCost = varServerLimit * getPurchasedServerCost(varServerSizeToBuy);
+
+tprint("Maximum size server I can afford is " + varServerSizeToBuy + "GB. Cost is " + varTotalCost);
+
+
+while (i < getPurchasedServerLimit()) {
+    if (getServerMoneyAvailable("home") > getPurchasedServerCost(varServerSizeToBuy)) {
+        if (serverExists("pserv-" + i)) {
+            if (getServerMaxRam("pserv-" + i) < varServerSizeToBuy) {
+            tprint("Deleting server pserv-" + i);
+            killall("pserv-" + i);
+            sleep(10000);
+            deleteServer("pserv-" + i);
+            }
+            else {
+                tprint("Server pserv-" + i +" is already the right size.");
+            }
+        }
+        else {
+            tprint("Purchasing server pserv-" + i);
+            var hostname = purchaseServer("pserv-" + i, varServerSizeToBuy);
+        }
+        ++i;
+    }
+}
