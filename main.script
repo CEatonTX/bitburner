@@ -1,18 +1,10 @@
-// Array of all servers that don't need any ports opened
-// to gain root access. These have 16 GB of RAM
-
-var varDebug = false
-var varKeep = false
-var varReplace = false
-tprint("DEBUG Debug:" + varDebug);
-tprint("DEBUG Keep:" + varKeep);
-tprint("DEBUG Replace:" + varReplace);
-
+var varDebug = false;
+var varKeep = false;
 
 for (var i = 0; i < args.length; ++i) {
     tprint("DEBUG args[" + i + "]= " + args[i]);
     if (args[i] == "debug") { varDebug = true }
-    if (args[i] == "keep") { varKeep = true }
+    if (args[i] == "keepReplace") { varKeep = true }
     if (args[i] == "replace") { varKeep = false }
 }
 
@@ -22,9 +14,8 @@ tprint("Keep:" + varKeep);
 
 tprint("");
 
-var varServers = ["n00dles",
-    "foodnstuff",
-    "sigma-cosmetics", "joesguns", "nectar-net", "hong-fang-tea",
+var serversArray = ["n00dles",
+    "foodnstuff", "sigma-cosmetics", "joesguns", "nectar-net", "hong-fang-tea",
     "harakiri-sushi", "neo-net",
     "zer0", "max-hardware", "iron-gym",
     "silver-helix", "phantasy", "omega-net",
@@ -33,89 +24,19 @@ var varServers = ["n00dles",
     "pserv-6", "pserv-7", "pserv-8", "pserv-9", "pserv-10", "pserv-11",
     "pserv-12", "pserv-13", "pserv-14", "pserv-15", "pserv-16", "pserv-17",
     "pserv-18", "pserv-19", "pserv-20", "pserv-21", "pserv-22", "pserv-23", "pserv-24",
-    "the-hub", "johnson-ortho", "darkweb"];
-
-function runScript(name, server, instances) {
-    tprint("Attempting to kill all scripts running on " + server);
-    killall(server);
-    tprint("transfering hack.script to " + server);
-    scp("hack.script", server);
-    tprint("Executing " + instances + " instances of script on " + server);
-    if (instances > 0) {
-        exec(name, server, instances);
-    }
-    else { tprint("I can't run 0 instances, that don't make sense.") }
-    return;
-}
-
-// main loop run on every instance in the varServers array variable
-for (var i = 0; i < varServers.length; ++i) {
-    var varServ = varServers[i];
-    if (serverExists(varServ)) {
-        var servMaxRam = getServerMaxRam(varServ);
-        var numInstances = Math.floor(servMaxRam / getScriptRam("hack.script"));
-        if (hasRootAccess(varServ)) {
-            tprint("I have root access on " + varServ);
-            if (scriptRunning("hack.script", varServ)) {
-                tprint("hack.script is already running on " + varServ);
-                if (varKeep == false) {
-                    tprint("replacing hack.script on" + varServ);
-                    runScript("hack.script", varServ, numInstances);
-                }
-            }
-            else {
-                tprint("Installing hack.script on " + varServ);
-                runScript("hack.script", varServ, numInstances);
-            }
-        }
-
-        else {
-            tprint("need root access on " + varServ + "  trying to get it.");
-            if (getServerNumPortsRequired(varServ) > 0) {
-                if (fileExists("BruteSSH.exe")){
-                    tprint("brutesssh(" + varServ + ")");
-                    brutessh(varServ);
-                }
-                else {tprint("BruteSSH.exe does not exist.")}
-            }
-            if (getServerNumPortsRequired(varServ) > 1) {
-                tprint("ftpcrack(" + varServ + ")");
-                if (fileExists("FTPcrack.exe")){
-                ftpcrack(varServ);
-                }
-                else {tprint("FTPcrack.exe does not exist.")}
-            }
-            if (getServerNumPortsRequired(varServ) > 2) {
-                tprint("relaysmtp(" + varServ + ")");
-                if (fileExists("relaysSMTP.exe")){
-                    relaysmtp(varServ);
-                }
-                else {tprint("relaysmtp.exe does not exist.")}
-            }
+    "the-hub", "johnson-ortho", "darkweb", "netlink", "rothman-uni", "compteck",
+    "summit-uni", "I.I.I.I", "zb-institue", "syscore", "catalyst"];
 
 
-            if (hasRootAccess(varServ)) {
-                tprint("Root access exsists. This is unexpected.");
-            }
-            else {
-                tprint("nuke(" + varServ + ")");
-                nuke(varServ);
-            }
-
-            if (hasRootAccess(varServ)) {
-                tprint("I have root access now.")
-                runScript("hack.script", varServ, numInstances);
-            }
-            else {
-                tprint("I still do not have root access. Leaving this server alone.")
-            }
-
-
-        }
+// main loop run on every instance in the serversArray array variable
+for (var i = 0; i < serversArray.length; ++i) {
+    var currentServer = serversArray[i];
+    if (varKeep = true) {
+        var keepReplace = "keepReplace";
     }
     else {
-        tprint("DEBUG server" + varServers[i] + " does not exsist. Moving on. ");
-
+        var keepReplace = "replace";
     }
+    run("updateserver.script", 1, currentServer, keepReplace);
 }
 tprint("End");
