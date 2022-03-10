@@ -1,0 +1,10 @@
+Updateserver will transfer a script to a server and start running it.
+
+Options:
+
+updateserver(serverToUpdate,hackTarget,Debug,Keep)
+
+
+Debug is true or false
+
+Keep can be replace or keep
