@@ -2,7 +2,7 @@ Updateserver will transfer a script to a server and start running it.
 
 Options:
 
-updateserver(serverToUpdate,hackTarget,Debug,Keep)
+updateserver(serverToUpdate,hackTarget,Keep)
 
 
 Debug is true or false
