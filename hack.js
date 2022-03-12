@@ -5,29 +5,23 @@ Useage:
 run hack.js target -t (num of threads)
 */
 
-var serverName = args[0];
-tprint("Hacking server " + serverName);
-if (serverName == "") {
-    serverName = "joesguns";
-}
 
-var moneyThresh = getServerMaxMoney(serverName) * 0.75;
-var securityThresh = getServerMinSecurityLevel(serverName) + 5;
-var numInstances = Math.floor(getServerMaxRam(serverName) / getScriptRam("hack.script"));
+/** @param {NS} ns **/
+export async function main(ns) {
+	var target = ns.args[0];
+	ns.tprint("Hacking sever " + target);
+	var moneyThresh = ns.getServerMaxMoney(target) * 0.75;
+	var securityThresh = ns.getServerMinSecurityLevel(target) + 5;
 
 while (true) {
 
-    if (hasRootAccess(serverName)) {
-        if (getServerSecurityLevel(serverName) > securityThresh) {
-
-//            weaken(serverName,numInstances);
-            weaken(serverName);
-        } else if (getServerMoneyAvailable(serverName) < moneyThresh) {
-//            grow(serverName,numInstances);
-            grow(serverName);
-        } else {
-//            hack(serverName,numInstances);
-            hack(serverName);
-        }
-    }
+	if (ns.hasRootAccess(target)) {
+		if (ns.getServerSecurityLevel(target) > securityThresh) {
+			await ns.weaken(target);
+		} else if (ns.getServerMoneyAvailable(target) < moneyThresh) {
+			await ns.grow(target);
+		} else {
+			await ns.hack(target);
+		}
+	}
 }
