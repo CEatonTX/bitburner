@@ -1,8 +1,0 @@
-hack.script(serverName)
-
-serverName is the name of the server to hack.
-
-exec("hack.script",n00dles,1,"joesguns");
-
-exec(name of script, server to run on , num of instances, hack target)
-
