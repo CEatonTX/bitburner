@@ -9,14 +9,16 @@ export async function main(ns) {
         requiredHackingLevel,
         numPortsRequired,
         maxRam,
-        rootjsinstalled) {
+        hackjsinstalled,
+        hackjsrunning) {
         this.name = name;
         this.connection = connection;
         this.rootAccess = rootAccess;
         this.requiredHackingLevel = requiredHackingLevel;
         this.numPortsRequired = numPortsRequired;
         this.maxRam = maxRam;
-        this.rootjsinstalled = rootjsinstalled;
+        this.hackjsinstalled = hackjsinstalled;
+        this.hackjsrunning = hackjsrunning;
     }
 
     function addtoServers(servername) {
@@ -42,7 +44,8 @@ export async function main(ns) {
                     ns.getServerRequiredHackingLevel(servername),           // requiredHackingLevel
                     ns.getServerNumPortsRequired(servername),           // numPortsRequired
                     ns.getServerMaxRam(servername),            // maxRam
-                    ns.fileExists("hack.js", servername)
+                    ns.fileExists("hack.js", servername),        //hackjsinstalled
+                    ns.scriptRunning("hack.js", servername)     //hackjsrunning
                 ))
 
             }
@@ -91,9 +94,9 @@ export async function main(ns) {
     }
 
 
-    function getRoot(hostName) {
+    async function getRoot(hostName) {
         if (serverarray.find(server => server.name === hostName).rootAccess == false) {
-            ns.tprint("need root access on " + hostName + "  trying to get it.");
+            //ns.tprint("need root access on " + hostName + "  trying to get it.");
             // Open up ports if needed
             if (ns.getServerNumPortsRequired(hostName) > 0) {
                 if (ns.fileExists("BruteSSH.exe")) {
@@ -123,19 +126,46 @@ export async function main(ns) {
                 }
                 else { ns.tprint("HTTPWorm.exe does not exist.") }
             }
+            //Nuke it if you need too. check open ports vs needed and figure out if we can do it or not
+            // don't do it if your not going to get it.
+            if (serverarray.find(server => server.name === hostName).requiredHackingLevel < ns.getHackingLevel()) {
+                try {
+                    //ns.tprint("Nuking host: " + hostName);
+                    ns.nuke(hostName);
+                }
+                catch (error) {
+                    //ns.tprint("Not enough ports open to Nuke host: " + hostName);
+                }
+            }
         }
         else {
             // server already has root access
         }
-
     }
 
     async function installHackjs(hostName) {
-        if (serverarray.find(server => server.name === hostName).rootjsinstalled == false) {
-            ns.tprint("Installing hack.js on " + hostName);
+        if (serverarray.find(server => server.name === hostName).hackjsinstalled == false) {
+            //ns.tprint("Installing hack.js on " + hostName);
             // Open up ports if needed
             await ns.scp("hack.js", hostName);
         }
+    }
+
+    async function runhackjs(hostName) {
+        if (serverarray.find(server => server.name === hostName).hackjsinstalled == true) {
+            if (serverarray.find(server => server.name === hostName).hackjsrunning == false) {
+                var servMaxRam = serverarray.find(server => server.name === hostName).maxRam;
+                var numInstances = Math.floor(servMaxRam / ns.getScriptRam("hack.js", hostName));
+                if (numInstances > 0) {
+                    ns.exec("hack.js", hostName, numInstances, hostName);
+                }
+            }
+            else {
+                //ns.tprint("hack.js IS running on " + hostName);
+            }
+
+        }
+
     }
 
     let serverarray = []  // This will store all our data using the schema defined above. 
@@ -152,21 +182,24 @@ export async function main(ns) {
 
         let nameList = serverarray.map(s => s.name); // create a list of hostnames
 
-       // nameList.forEach(hostName => getRoot(hostName));  //get root on anything that needs rooting
+        // nameList.forEach(hostName => getRoot(hostName));  //get root on anything that needs rooting
         for (const hostName of nameList) {
             await getRoot(hostName);
         }
 
-        //nameList.forEach(hostName => await installHackjs(hostName)); 
-        
         // install hack.js on any server that needs it.
         for (const hostName of nameList) {
             await installHackjs(hostName);
         }
 
-        await ns.sleep(5000)       // Delay between loops
+        // run hack.js on any server that needs it.
+        for (const hostName of nameList) {
+            await runhackjs(hostName);
+        }
 
-        keepGoing = false;          // uncomment to run only once. 
+        await ns.sleep(60000)       // Delay between loops
+
+        //keepGoing = false;          // uncomment to run only once. 
 
     }
 
@@ -178,7 +211,8 @@ export async function main(ns) {
     // ##### DEBUG Uncomment below to print all data in the array
     updateServerList();         // scan everything and add any new servers. 
 
-    serverarray.forEach(value => ns.tprint(value));
+    //serverarray.forEach(value => ns.tprint(value));
+    //ns.getServer.forEach(value => ns.tprint(value));
 
     //serverarray.forEach(value => ns.tprint(value.name + " root status is: " + value.rootAccess));
     // serverarray.forEach(value => ns.tprint(value));
