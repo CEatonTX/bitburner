@@ -8,13 +8,15 @@ export async function main(ns) {
         rootAccess,
         requiredHackingLevel,
         numPortsRequired,
-        maxRam) {
+        maxRam,
+        rootjsinstalled) {
         this.name = name;
         this.connection = connection;
         this.rootAccess = rootAccess;
         this.requiredHackingLevel = requiredHackingLevel;
         this.numPortsRequired = numPortsRequired;
         this.maxRam = maxRam;
+        this.rootjsinstalled = rootjsinstalled;
     }
 
     function addtoServers(servername) {
@@ -39,7 +41,8 @@ export async function main(ns) {
                     ns.hasRootAccess(servername),        // rootAccess
                     ns.getServerRequiredHackingLevel(servername),           // requiredHackingLevel
                     ns.getServerNumPortsRequired(servername),           // numPortsRequired
-                    ns.getServerMaxRam(servername)            // maxRam
+                    ns.getServerMaxRam(servername),            // maxRam
+                    ns.fileExists("hack.js", servername)
                 ))
 
             }
@@ -87,18 +90,98 @@ export async function main(ns) {
         }
     }
 
+
+    function getRoot(hostName) {
+        if (serverarray.find(server => server.name === hostName).rootAccess == false) {
+            ns.tprint("need root access on " + hostName + "  trying to get it.");
+            // Open up ports if needed
+            if (ns.getServerNumPortsRequired(hostName) > 0) {
+                if (ns.fileExists("BruteSSH.exe")) {
+                    //ns.tprint("brutesssh(" + hostName + ")");
+                    ns.brutessh(hostName);
+                }
+                else { ns.tprint("BruteSSH.exe does not exist.") }
+            }
+            if (ns.getServerNumPortsRequired(hostName) > 1) {
+                // ns.tprint("ftpcrack(" + hostName + ")");
+                if (ns.fileExists("FTPCrack.exe")) {
+                    //ns.ftpcrack(hostName);
+                }
+                else { tprint("FTPcrack.exe does not exist.") }
+            }
+            if (ns.getServerNumPortsRequired(hostName) > 2) {
+                //ns.tprint("relaysmtp(" + hostName + ")");
+                if (ns.fileExists("relaySMTP.exe")) {
+                    //ns.relaysmtp(hostName);
+                }
+                else { ns.tprint("relaysmtp.exe does not exist.") }
+            }
+            if (ns.getServerNumPortsRequired(hostName) > 3) {
+                //ns.tprint("httpworm(" + hostName + ")");
+                if (ns.fileExists("HTTPWorm.exe")) {
+                    //ns.httpworm(hostName);
+                }
+                else { ns.tprint("HTTPWorm.exe does not exist.") }
+            }
+        }
+        else {
+            // server already has root access
+        }
+
+    }
+
+    async function installHackjs(hostName) {
+        if (serverarray.find(server => server.name === hostName).rootjsinstalled == false) {
+            ns.tprint("Installing hack.js on " + hostName);
+            // Open up ports if needed
+            await ns.scp("hack.js", hostName);
+        }
+    }
+
     let serverarray = []  // This will store all our data using the schema defined above. 
     // initial scan of root to get base level servers
     scanAndAddNewServers("home");
     // update the server list by scanning everything known until there are no new knowns:
-    updateServerList();
+
+    // main loop to run everything 
+    let keepGoing = true;
+
+    while (keepGoing) {
+
+        updateServerList();         // scan everything and add any new servers. 
+
+        let nameList = serverarray.map(s => s.name); // create a list of hostnames
+
+       // nameList.forEach(hostName => getRoot(hostName));  //get root on anything that needs rooting
+        for (const hostName of nameList) {
+            await getRoot(hostName);
+        }
+
+        //nameList.forEach(hostName => await installHackjs(hostName)); 
+        
+        // install hack.js on any server that needs it.
+        for (const hostName of nameList) {
+            await installHackjs(hostName);
+        }
+
+        await ns.sleep(5000)       // Delay between loops
+
+        keepGoing = false;          // uncomment to run only once. 
+
+    }
+
+    ns.tprint("Script ending.");
 
     // ##### DEBUG Uncomment below to print all known server names
-    ns.tprint(serverarray.map(s => s.name));
+    //ns.tprint(serverarray.map(s => s.name));
 
     // ##### DEBUG Uncomment below to print all data in the array
+    updateServerList();         // scan everything and add any new servers. 
+
+    serverarray.forEach(value => ns.tprint(value));
+
+    //serverarray.forEach(value => ns.tprint(value.name + " root status is: " + value.rootAccess));
     // serverarray.forEach(value => ns.tprint(value));
- 
 
 
 
